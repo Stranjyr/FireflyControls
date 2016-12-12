@@ -3,8 +3,8 @@ import gaugette.gpio
 import gaugette.rotary_encoder
 
 
-A_PIN = 7
-B_PIN = 9
+A_PIN = 2
+B_PIN = 3
 gpio = gaugette.gpio.GPIO()
 encoder = gaugette.rotary_encoder.RotaryEncoder(gpio, A_PIN, B_PIN)
 encoder.start()
