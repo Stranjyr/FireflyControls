@@ -66,7 +66,7 @@ if __name__ == '__main__':
 	d = int(raw_input("Enter D:  "))
 	pid = PID(p, i, d) #the PID gains. Should be able to set the P gain such that we get occilation, then the D gain to remove the occilation.
 	try:
-		zero = br.getReadings()[0][1]
+		zero = 0#br.getReadings()[0][1]
 		while True:
 			roll = br.getReadings()[0][1] - zero
 			print("{} : roll".format(roll))
