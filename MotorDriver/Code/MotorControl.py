@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import VNH5019 as MDriver
 #from scipy import signal
+from PID import *
 import numpy as np
 import time
 import RPi.GPIO as gpio
@@ -68,9 +69,9 @@ if __name__ == '__main__':
 		zero = br.getReadings()[0][1]
 		while True:
 			roll = br.getReadings()[0][1] - zero
-			print(roll)
+			print("{} : roll".format(roll))
 			pid.update(roll)
-			print(pid.output)
+			print("{} : pid".format(pid.output))
 			control.magnitude = pid.output
 			#time.sleep(.1)
 	except KeyboardInterrupt:
