@@ -9,9 +9,8 @@ import BNO_Reader as bno
 import gaugette.gpio
 import gaugette.rotary_encoder
 class MotorFunctionControl(object):
-	def __init__(self, driver, encode, function = None, frequency = 1, magnitude = 0):
+	def __init__(self, driver, function = None, frequency = 1, magnitude = 0):
 		self.driver = driver
-		self.encode = encode
 		if function == None:
 			self.function = self.Triwave
 		else:
@@ -31,7 +30,6 @@ class MotorFunctionControl(object):
 		self.function_thread.daemon = True
 		self.totalTurn = 0
 		self.function_thread.start()
-		self.encode.start()
 
 
 	'''
@@ -51,8 +49,6 @@ class MotorFunctionControl(object):
 			self.lastTime = time.clock()
 			newSpeed = self.function(self.runTime, self.magnitude, self.frequency)
 			self.driver.runMotor(newSpeed)
-			self.totalTurn += encoder.getDelta()
-			println(totalTurn)
 			time.sleep(.001)
 
 
@@ -62,18 +58,21 @@ if __name__ == '__main__':
 	br = bno.BNO_Reader(100)
 	br.start_bno_thread()
 	drive = MDriver.VNH5019(17, 18, 13)
-	A_PIN = 2
-	B_PIN = 3
-	gpio = gaugette.gpio.GPIO()
-	encoder = gaugette.rotary_encoder.RotaryEncoder(gpio, A_PIN, B_PIN)
-	control = MotorFunctionControl(drive, encoder, function = lambda t, m, f : m)
+	control = MotorFunctionControl(drive, function = lambda t, m, f : m)
 	control.start()
+	p = int(raw_input("Enter P:  "))
+	i = int(raw_input("Enter I:  "))
+	d = int(raw_input("Enter D:  "))
+	pid = PID(p, i, d) #the PID gains. Should be able to set the P gain such that we get occilation, then the D gain to remove the occilation.
 	try:
+		zero = br.getReadings()[0][1]
 		while True:
-			r = br.getReadings()
-			control.magnitude = r[0][1]
-			print(r[0][1])
-
+			roll = br.getReadings()[0][1] - zero
+			print(roll)
+			pid.update(roll)
+			print(pid.output)
+			control.magnitude = pid.output
+			#time.sleep(.1)
 	except KeyboardInterrupt:
 		control.magnitude = 0
 		control.stopThread = False
