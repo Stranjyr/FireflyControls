@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import VNH5019 as MDriver
 #from scipy import signal
 import numpy as np
@@ -6,9 +6,12 @@ import time
 import RPi.GPIO as gpio
 import threading
 import BNO_Reader as bno
+import gaugette.gpio
+import gaugette.rotary_encoder
 class MotorFunctionControl(object):
-	def __init__(self, driver, function = None, frequency = 1, magnitude = 0):
+	def __init__(self, driver, encode, function = None, frequency = 1, magnitude = 0):
 		self.driver = driver
+		self.encode = encode
 		if function == None:
 			self.function = self.Triwave
 		else:
@@ -26,7 +29,11 @@ class MotorFunctionControl(object):
 		self.lastTime = time.clock()
 		self.function_thread = threading.Thread(target=self.run_function_thread)
 		self.function_thread.daemon = True
+		self.totalTurn = 0
 		self.function_thread.start()
+		self.encode.start()
+
+
 	'''
 	Sample Triangle Wave to use as the function input
 	'''
@@ -44,6 +51,8 @@ class MotorFunctionControl(object):
 			self.lastTime = time.clock()
 			newSpeed = self.function(self.runTime, self.magnitude, self.frequency)
 			self.driver.runMotor(newSpeed)
+			self.totalTurn += encoder.getDelta()
+			println(totalTurn)
 			time.sleep(.001)
 
 
@@ -53,7 +62,11 @@ if __name__ == '__main__':
 	br = bno.BNO_Reader(100)
 	br.start_bno_thread()
 	drive = MDriver.VNH5019(17, 18, 13)
-	control = MotorFunctionControl(drive, function = lambda t, m, f : m)
+	A_PIN = 2
+	B_PIN = 3
+	gpio = gaugette.gpio.GPIO()
+	encoder = gaugette.rotary_encoder.RotaryEncoder(gpio, A_PIN, B_PIN)
+	control = MotorFunctionControl(drive, encoder, function = lambda t, m, f : m)
 	control.start()
 	try:
 		while True:
