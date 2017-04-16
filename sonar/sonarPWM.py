@@ -26,7 +26,7 @@ def measure():
   time.sleep(0.00001)
   GPIO.output(GPIO_TRIGGER, False)
   start = time.time()
-
+  #print "here"
   while GPIO.input(GPIO_ECHO)==0:
     start = time.time()
 
@@ -59,8 +59,8 @@ def measure_average():
 GPIO.setmode(GPIO.BCM)
 
 # Define GPIO to use on Pi
-GPIO_TRIGGER = 14
-GPIO_ECHO    = 15
+GPIO_TRIGGER = 15
+GPIO_ECHO    = 24
 
 print "Ultrasonic Measurement"
 
@@ -79,14 +79,14 @@ GPIO.output(GPIO_TRIGGER, False)
 try:
   #srv = ServoController(17, 50, (5.0, 110.0))
   #srv.start()
-  with open("data.dat", 'w') as f:
-    while True:
-
-      distance = measure_average()
-      print "Distance : %.1f" % distance
-      f.write("{}\n".format(distance))
-      #srv.updateAngle(distance)
-      time.sleep(.1)
+  #with open("data.dat", 'w') as f:
+  while True:
+    print "here"
+    distance = measure_average()
+    print "Distance : %.1f" % distance
+    #  f.write("{}\n".format(distance))
+    #srv.updateAngle(distance)
+    #  time.sleep(.1)
 
 except KeyboardInterrupt:
   # User pressed CTRL-C

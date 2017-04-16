@@ -1,5 +1,5 @@
 import RPi.GPIO as gpio
-
+import time
 class VNH5019:
 	def __init__(self, A, B, PWM):
 		self.apin = A
@@ -37,6 +37,7 @@ class VNH5019:
 			gpio.output(self.bpin, False)
 
 	'''
+
 	Sets to motors to run at a given speed. 
 	Accepts values between -100 and 100
 	The absolute value of the input is the percentage
@@ -44,7 +45,7 @@ class VNH5019:
 	'''
 	def runMotor(self, speed):
 		self.setDir(speed) #spin the motors the proper way
-		self.pwmSettings.ChangeDutyCycle(min(abs(speed), 100))
+		self.pwmSettings.ChangeDutyCycle(min(abs(speed), 99))
 	def close(self):
 		self.pwmSettings.stop()
 		gpio.cleanup()
@@ -52,8 +53,13 @@ if __name__ == "__main__":
 	v = VNH5019(17, 18, 13)	
 	try:
 		while True:
+			print("Run for 15 Seconds")
 			s = float(input("Enter the motor speed (-100 to 100)"))
-			v.runMotor(s)	
+			v.runMotor(s)
+			t = time.time()
+			while(time.time() - t < 10):
+				pass
+			v.runMotor(0)	
 	except KeyboardInterrupt:
 		v.close()
 		print("Done")

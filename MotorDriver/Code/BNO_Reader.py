@@ -3,7 +3,7 @@ import time
 from Adafruit_BNO055 import BNO055
 
 class BNO_Reader:
-    def __init__(self, freq = 100):
+    def __init__(self, freq = 200):
         # How often to update the BNO sensor data (in hertz).
         self.BNO_UPDATE_FREQUENCY_HZ = freq
         # Create and configure the BNO sensor connection.  Make sure only ONE of the
